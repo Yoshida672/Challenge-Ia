@@ -4,9 +4,9 @@ Este projeto simula a localização de múltiplas tags UWB em um pátio com base
 
 ## 👥 Alunos
 
-- Nome 1
-- Nome 2
-- Nome 3
+- Eric issamu de lima Yoshida
+- Gustavo Matias Teixeira
+- Gustavo Monção
 
 ## 🎯 Objetivo
 
