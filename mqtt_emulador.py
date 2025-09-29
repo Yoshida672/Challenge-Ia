@@ -6,54 +6,51 @@ import requests
 from datetime import datetime, timezone
 from paho.mqtt.client import CallbackAPIVersion
 
-# Configurações do broker MQTT e tópico
 broker = "broker.hivemq.com"
 topic = "simulador/uwb/localizacao"
 
-# Inicializa o cliente MQTT com ID e versão de callback
 client = mqtt.Client(client_id="SimuladorUWB", callback_api_version=CallbackAPIVersion.VERSION2)
+client.connect(broker)
 
-try:
-    client.connect(broker)
-    print(f"Conectado ao broker MQTT: {broker}")
-except Exception as e:
-    print(f"Erro ao conectar no MQTT: {e}")
-    exit(1)
+GAS_URL = "https://script.google.com/macros/s/AKfycbzK8U0LyovbeN5b0-UApTngz1ZaU7Q_pvM-rc8m1_tDnhvHFCU9pOs5-3m3svKSb474/exec"
 
-# URL do Webhook do Google Apps Script (deve estar publicado como Web App)
-GAS_URL = "https://script.google.com/macros/s/AKfycbwcP64Y3c8OsNU5E0AuaQRKceuIM1Da2yThTRKb28xRfAKzdbUspQeSmBewDfI2tVqf/exec"
+# Lista de ESPs/tags
+tags = ["TAG_ESP1", "TAG_ESP2","TAG_ESP3"]  # Adicione quantos quiser
 
-# Função para simular dados de posição
-def simular_dado():
+# Estado atual das tags (para atualizar)
+estado_tags = {tag: None for tag in tags}
+
+def simular_dado(tag_id):
     return {
-        "tagId": "TAG_SIMULADA",
+        "acao": "update_or_create",  # identifica ação de update no Apps Script
+        "tagId": tag_id,
         "x": round(random.uniform(0, 10), 2),
         "y": round(random.uniform(0, 10), 2),
         "z": 0.0,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
-# Loop principal de envio
 while True:
-    dado = simular_dado()
-    mensagem = json.dumps(dado)
+    for tag in tags:
+        dado = simular_dado(tag)
+        estado_tags[tag] = dado  # atualiza estado interno
+        mensagem = json.dumps(dado)
 
-    # Envia via MQTT
-    try:
-        client.publish(topic, mensagem)
-        print(f"✅ Enviado via MQTT: {mensagem}")
-    except Exception as e:
-        print(f"❌ Erro ao enviar via MQTT: {e}")
+        # Envia via MQTT
+        try:
+            client.publish(topic, mensagem)
+            print(f"✅ MQTT: {mensagem}")
+        except Exception as e:
+            print(f"❌ Erro MQTT: {e}")
 
-    # Envia para o Google Sheets via POST
-    try:
-        response = requests.post(GAS_URL, json=dado)
-        if response.status_code == 200:
-            print(f"✅ Enviado para Google Sheets: {response.text}")
-        else:
-            print(f"⚠️ Resposta do Google Sheets: {response.status_code} - {response.text}")
-    except Exception as e:
-        print(f"❌ Erro ao enviar para Sheets: {e}")
+        # Envia para Google Sheets
+        try:
+            response = requests.post(GAS_URL, json=dado)
+            if response.status_code == 200:
+                print(f"✅ Google Sheets: {response.text}")
+            else:
+                print(f"⚠️ Sheets: {response.status_code} - {response.text}")
+        except Exception as e:
+            print(f"❌ Erro Sheets: {e}")
 
-    # Aguarda 2 segundos antes de enviar o próximo
     time.sleep(2)

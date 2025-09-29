@@ -3,8 +3,9 @@ import time
 import random
 from datetime import datetime
 
-ID = 3
-URL = f"http://localhost:8080/tags/posicao/{ID}"
+TAGS = [1, 2, 3]  # IDs dos ESPs/tags
+falhas_consecutivas = {tag: 0 for tag in TAGS}  # contador por tag
+estado_tags = {tag: None for tag in TAGS}  # último estado por tag
 
 def gerar_dados():
     return {
@@ -13,33 +14,35 @@ def gerar_dados():
         "timestamp": datetime.now().isoformat()
     }
 
-falhas_consecutivas = 0
-
 while True:
-    dados = gerar_dados()
-    try:
-        resposta = requests.post(URL, json=dados, timeout=5)
+    for ID in TAGS:
+        URL = f"http://localhost:8080/tags/posicao/{ID}"
+        dados = gerar_dados()
+        estado_tags[ID] = dados
 
-        if resposta.status_code == 200:
-            print(f"✅ Enviado: {dados} | Resposta: {resposta.text}")
-            falhas_consecutivas = 0  # Zera contador de falhas
+        try:
+            resposta = requests.post(URL, json=dados, timeout=5)
+
+            if resposta.status_code == 200:
+                print(f"✅ Tag {ID} enviada: {dados} | Resposta: {resposta.text}")
+                falhas_consecutivas[ID] = 0
+            else:
+                print(f"⚠️ Tag {ID} erro HTTP {resposta.status_code}: {resposta.text}")
+                falhas_consecutivas[ID] += 1
+
+        except requests.exceptions.Timeout:
+            print(f"⏱️ Tag {ID} timeout")
+            falhas_consecutivas[ID] += 1
+        except requests.exceptions.ConnectionError:
+            print(f"🔌 Tag {ID} erro de conexão")
+            falhas_consecutivas[ID] += 1
+        except Exception as e:
+            print(f"❌ Tag {ID} erro inesperado: {e}")
+            falhas_consecutivas[ID] += 1
+
+        # Se muitas falhas consecutivas, espera mais
+        if falhas_consecutivas[ID] >= 3:
+            print(f"⚠️ Tag {ID} muitas falhas consecutivas. Aguardando 30s...")
+            time.sleep(30)
         else:
-            print(f"⚠️ Erro HTTP {resposta.status_code}: {resposta.text}")
-            falhas_consecutivas += 1
-
-    except requests.exceptions.Timeout:
-        print("⏱️ Timeout: O servidor demorou demais para responder.")
-        falhas_consecutivas += 1
-    except requests.exceptions.ConnectionError:
-        print("🔌 Erro de conexão: Não foi possível se conectar à API.")
-        falhas_consecutivas += 1
-    except Exception as e:
-        print(f"❌ Erro inesperado: {e}")
-        falhas_consecutivas += 1
-
-    # Se ocorrerem muitas falhas, aguarde mais tempo antes de tentar novamente
-    if falhas_consecutivas >= 3:
-        print("⚠️ Muitas falhas consecutivas. Aguardando 30 segundos...")
-        time.sleep(30)
-    else:
-        time.sleep(5)
+            time.sleep(1)  # intervalo entre envios por tag
