@@ -12,10 +12,10 @@ topic = "simulador/uwb/localizacao"
 client = mqtt.Client(client_id="SimuladorUWB", callback_api_version=CallbackAPIVersion.VERSION2)
 client.connect(broker)
 
-GAS_URL = "https://script.google.com/macros/s/AKfycbzK8U0LyovbeN5b0-UApTngz1ZaU7Q_pvM-rc8m1_tDnhvHFCU9pOs5-3m3svKSb474/exec"
+GAS_URL = "https://script.google.com/macros/s/AKfycbyro7RNZVn09eTBeoJaUQaSuPi3wUaEXbPlvMkeWPhICFlqcnH2RAs0AbMo-LRXIlKk/exec"
 
 # Lista de ESPs/tags
-tags = ["TAG_ESP1", "TAG_ESP2","TAG_ESP3"]  # Adicione quantos quiser
+tags = ["UWB-001", "UWB-002","UWB-003"]  # Adicione quantos quiser
 
 # Estado atual das tags (para atualizar)
 estado_tags = {tag: None for tag in tags}
@@ -39,18 +39,18 @@ while True:
         # Envia via MQTT
         try:
             client.publish(topic, mensagem)
-            print(f"✅ MQTT: {mensagem}")
+            print(f"MQTT: {mensagem}")
         except Exception as e:
-            print(f"❌ Erro MQTT: {e}")
+            print(f"Erro MQTT: {e}")
 
         # Envia para Google Sheets
         try:
             response = requests.post(GAS_URL, json=dado)
             if response.status_code == 200:
-                print(f"✅ Google Sheets: {response.text}")
+                print(f"Google Sheets: {response.text}")
             else:
-                print(f"⚠️ Sheets: {response.status_code} - {response.text}")
+                print(f"Sheets: {response.status_code} - {response.text}")
         except Exception as e:
-            print(f"❌ Erro Sheets: {e}")
+            print(f"Erro Sheets: {e}")
 
     time.sleep(2)

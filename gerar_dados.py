@@ -24,25 +24,26 @@ while True:
             resposta = requests.post(URL, json=dados, timeout=5)
 
             if resposta.status_code == 200:
-                print(f"✅ Tag {ID} enviada: {dados} | Resposta: {resposta.text}")
+                print(f"Tag {ID} enviada com sucesso: {dados} | Resposta: {resposta.text}")
+
                 falhas_consecutivas[ID] = 0
             else:
-                print(f"⚠️ Tag {ID} erro HTTP {resposta.status_code}: {resposta.text}")
+                print(f"Tag {ID} erro inesperado: {e}")
                 falhas_consecutivas[ID] += 1
 
         except requests.exceptions.Timeout:
-            print(f"⏱️ Tag {ID} timeout")
+            print(f"Tag {ID} timeout")
             falhas_consecutivas[ID] += 1
         except requests.exceptions.ConnectionError:
-            print(f"🔌 Tag {ID} erro de conexão")
+            print(f"Tag {ID} erro de conexão")
             falhas_consecutivas[ID] += 1
         except Exception as e:
-            print(f"❌ Tag {ID} erro inesperado: {e}")
+            print(f"Tag {ID} erro inesperado: {e}")
             falhas_consecutivas[ID] += 1
 
         # Se muitas falhas consecutivas, espera mais
         if falhas_consecutivas[ID] >= 3:
-            print(f"⚠️ Tag {ID} muitas falhas consecutivas. Aguardando 30s...")
+            print(f"Tag {ID} muitas falhas consecutivas. Aguardando 30s...")
             time.sleep(30)
         else:
             time.sleep(1)  # intervalo entre envios por tag
