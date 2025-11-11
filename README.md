@@ -12,6 +12,11 @@ Este projeto simula a localização de múltiplas tags UWB em um pátio com base
 
 Simular a movimentação de motos em um pátio com até 100 veículos, utilizando dados de posição `x`, `y`, `z` e `timestamp`, como se fossem provenientes de módulos UWB físicos. Os dados são enviados via MQTT e registrados automaticamente em uma planilha Google Sheets.
 
+
+## Video de Execução
+
+[YOUTUBE](https://youtube.com/playlist?list=PLsjNwOw0FQHtjzT8JylgARE2fG_KbPi0e&si=yDs1q1l8r8AkGISD)
+
 ## ▶️ Como executar
 
 ### 1. Instale as dependências Python
