@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "moto-track-app",
+    "slug": "moto-track-app",
+    "scheme": "moto-track-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.eric_yoshida.mototrackapp"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-router", "expo-web-browser"],
+    "extra": {
+      "commitHash": "6c2c6bc41cfe55a0f728d06396f0f87d2603342c",
+      "googleAndroidClientId": "928773065471-r1ipcgigj608stj64ls7og5d65pkl2av.apps.googleusercontent.com",
+      "googleWebClientId": "928773065471-98afq426rb4dj3fs4ppopm2u86teoht8.apps.googleusercontent.com",
+      "eas": {
+        "projectId": "9de1abd7-ca6c-471d-a99c-21547eabf644"
+      }
+    }
+  }
+}
